@@ -8,8 +8,10 @@ import apiRoutes from './src/routes/api';
 const port = 8000;
 
 // In Codespaces, expose the API through the forwarded port URL for port 8000.
-const apiBaseUrl = process.env.CODESPACE_NAME
-  ? `https://${process.env.CODESPACE_NAME}-8000.app.github.dev`
+const codespaceName = process.env.CODESPACE_NAME;
+
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
   : 'http://localhost:8000';
 
 // Outside Codespaces, keep localhost support so the API runs normally in local development.
