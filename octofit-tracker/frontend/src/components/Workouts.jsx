@@ -1,44 +1,62 @@
-import { API_BASE_URL, useCollection } from '../api'
+import { useEffect, useState } from 'react'
 
-const endpointPath = "/api/workouts/";
-const endpoint = `${API_BASE_URL}${endpointPath}`;
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const API_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/workouts/`
+  : `http://localhost:8000/api/workouts/`
+
+function extractList(data, key) {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  if (Array.isArray(data?.[key])) return data[key]
+  return []
+}
 
 function Workouts() {
-  const { endpoint: resolvedEndpoint, error, items: workouts, status } = useCollection('workouts', endpoint)
+  const [workouts, setWorkouts] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then((data) => setWorkouts(extractList(data, 'workouts')))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading workouts...</p>
+  if (error) return <p>Error loading workouts: {error}</p>
 
   return (
-    <section className="content-panel">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Suggestions</p>
-          <h1>Workouts</h1>
-        </div>
-        <span className="endpoint-label">{resolvedEndpoint}</span>
-      </div>
-
-      {status === 'loading' && <p className="state-text">Loading workouts...</p>}
-      {status === 'error' && <p className="alert alert-warning mb-0">{error}</p>}
-
-      {status === 'success' && (
-        <div className="row g-3">
+    <div>
+      <h2>Workouts</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Focus Area</th>
+            <th>Difficulty</th>
+            <th>Duration (min)</th>
+            <th>Exercises</th>
+          </tr>
+        </thead>
+        <tbody>
           {workouts.map((workout) => (
-            <div className="col-lg-4" key={workout._id ?? workout.title}>
-              <article className="data-card h-100">
-                <span className="difficulty-pill">{workout.difficulty}</span>
-                <h2>{workout.title}</h2>
-                <p className="muted-line">{workout.focusArea} · {workout.durationMinutes} min</p>
-                <p>{workout.recommendedFor}</p>
-                <ul className="exercise-list">
-                  {(workout.exercises ?? []).map((exercise) => (
-                    <li key={exercise}>{exercise}</li>
-                  ))}
-                </ul>
-              </article>
-            </div>
+            <tr key={workout._id ?? workout.id}>
+              <td>{workout.title}</td>
+              <td>{workout.focusArea}</td>
+              <td>{workout.difficulty}</td>
+              <td>{workout.durationMinutes}</td>
+              <td>{Array.isArray(workout.exercises) ? workout.exercises.join(', ') : ''}</td>
+            </tr>
           ))}
-        </div>
-      )}
-    </section>
+        </tbody>
+      </table>
+    </div>
   )
 }
 
