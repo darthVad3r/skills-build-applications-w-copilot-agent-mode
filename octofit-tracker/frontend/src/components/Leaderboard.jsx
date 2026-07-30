@@ -1,42 +1,65 @@
-import { API_BASE_URL, useCollection } from '../api'
+import { useEffect, useState } from 'react'
 
-const endpointPath = "/api/leaderboard/";
-const endpoint = `${API_BASE_URL}${endpointPath}`;
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const API_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/leaderboard/`
+  : `http://localhost:8000/api/leaderboard/`
+
+function extractList(data, key) {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  if (Array.isArray(data?.[key])) return data[key]
+  return []
+}
 
 function Leaderboard() {
-  const { endpoint: resolvedEndpoint, error, items: leaderboard, status } = useCollection('leaderboard', endpoint)
+  const [entries, setEntries] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then((data) => setEntries(extractList(data, 'leaderboard')))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading leaderboard...</p>
+  if (error) return <p>Error loading leaderboard: {error}</p>
 
   return (
-    <section className="content-panel">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Competition</p>
-          <h1>Leaderboard</h1>
-        </div>
-        <span className="endpoint-label">{resolvedEndpoint}</span>
-      </div>
-
-      {status === 'loading' && <p className="state-text">Loading leaderboard...</p>}
-      {status === 'error' && <p className="alert alert-warning mb-0">{error}</p>}
-
-      {status === 'success' && (
-        <div className="leaderboard-list">
-          {leaderboard.map((entry) => (
-            <article className="leaderboard-row" key={entry._id ?? entry.rank}>
-              <span className="rank-badge">#{entry.rank}</span>
-              <div>
-                <h2>{entry.userName}</h2>
-                <p>{entry.teamName}</p>
-              </div>
-              <div className="score-block">
-                <strong>{entry.points}</strong>
-                <span>{entry.activityMinutes} min</span>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-    </section>
+    <div>
+      <h2>Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Team</th>
+            <th>Points</th>
+            <th>Active Minutes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries
+            .slice()
+            .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+            .map((entry) => (
+              <tr key={entry._id ?? entry.id}>
+                <td>{entry.rank}</td>
+                <td>{entry.userName}</td>
+                <td>{entry.teamName}</td>
+                <td>{entry.points}</td>
+                <td>{entry.activityMinutes}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 

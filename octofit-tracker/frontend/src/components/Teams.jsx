@@ -1,45 +1,62 @@
-import { API_BASE_URL, useCollection } from '../api'
+import { useEffect, useState } from 'react'
 
-const endpointPath = "/api/teams/";
-const endpoint = `${API_BASE_URL}${endpointPath}`;
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const API_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/teams/`
+  : `http://localhost:8000/api/teams/`
+
+function extractList(data, key) {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  if (Array.isArray(data?.[key])) return data[key]
+  return []
+}
 
 function Teams() {
-  const { endpoint: resolvedEndpoint, error, items: teams, status } = useCollection('teams', endpoint)
+  const [teams, setTeams] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then((data) => setTeams(extractList(data, 'teams')))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading teams...</p>
+  if (error) return <p>Error loading teams: {error}</p>
 
   return (
-    <section className="content-panel">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Groups</p>
-          <h1>Teams</h1>
-        </div>
-        <span className="endpoint-label">{resolvedEndpoint}</span>
-      </div>
-
-      {status === 'loading' && <p className="state-text">Loading teams...</p>}
-      {status === 'error' && <p className="alert alert-warning mb-0">{error}</p>}
-
-      {status === 'success' && (
-        <div className="row g-3">
+    <div>
+      <h2>Teams</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>City</th>
+            <th>Coach</th>
+            <th>Members</th>
+            <th>Weekly Goal (min)</th>
+          </tr>
+        </thead>
+        <tbody>
           {teams.map((team) => (
-            <div className="col-md-6 col-xl-4" key={team._id ?? team.name}>
-              <article className="data-card h-100">
-                <h2>{team.name}</h2>
-                <p className="muted-line">{team.city}</p>
-                <dl>
-                  <dt>Coach</dt>
-                  <dd>{team.coach}</dd>
-                  <dt>Members</dt>
-                  <dd>{team.memberCount}</dd>
-                  <dt>Weekly goal</dt>
-                  <dd>{team.weeklyGoalMinutes} minutes</dd>
-                </dl>
-              </article>
-            </div>
+            <tr key={team._id ?? team.id}>
+              <td>{team.name}</td>
+              <td>{team.city}</td>
+              <td>{team.coach}</td>
+              <td>{team.memberCount}</td>
+              <td>{team.weeklyGoalMinutes}</td>
+            </tr>
           ))}
-        </div>
-      )}
-    </section>
+        </tbody>
+      </table>
+    </div>
   )
 }
 

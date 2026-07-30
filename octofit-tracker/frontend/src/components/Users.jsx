@@ -1,45 +1,62 @@
-import { API_BASE_URL, useCollection } from '../api'
+import { useEffect, useState } from 'react'
 
-const endpointPath = "/api/users/";
-const endpoint = `${API_BASE_URL}${endpointPath}`;
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const API_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/users/`
+  : `http://localhost:8000/api/users/`
+
+function extractList(data, key) {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  if (Array.isArray(data?.[key])) return data[key]
+  return []
+}
 
 function Users() {
-  const { endpoint: resolvedEndpoint, error, items: users, status } = useCollection('users', endpoint)
+  const [users, setUsers] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then((data) => setUsers(extractList(data, 'users')))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading users...</p>
+  if (error) return <p>Error loading users: {error}</p>
 
   return (
-    <section className="content-panel">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Profiles</p>
-          <h1>Users</h1>
-        </div>
-        <span className="endpoint-label">{resolvedEndpoint}</span>
-      </div>
-
-      {status === 'loading' && <p className="state-text">Loading users...</p>}
-      {status === 'error' && <p className="alert alert-warning mb-0">{error}</p>}
-
-      {status === 'success' && (
-        <div className="row g-3">
+    <div>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Team</th>
+          </tr>
+        </thead>
+        <tbody>
           {users.map((user) => (
-            <div className="col-md-6 col-xl-4" key={user._id ?? user.username ?? user.email}>
-              <article className="data-card h-100">
-                <h2>{user.fullName ?? user.username}</h2>
-                <p className="muted-line">{user.email}</p>
-                <dl>
-                  <dt>Team</dt>
-                  <dd>{user.teamName}</dd>
-                  <dt>Role</dt>
-                  <dd>{user.role}</dd>
-                  <dt>Goal</dt>
-                  <dd>{user.fitnessGoal}</dd>
-                </dl>
-              </article>
-            </div>
+            <tr key={user._id ?? user.id}>
+              <td>{user.fullName}</td>
+              <td>{user.username}</td>
+              <td>{user.email}</td>
+              <td>{user.role}</td>
+              <td>{user.teamName}</td>
+            </tr>
           ))}
-        </div>
-      )}
-    </section>
+        </tbody>
+      </table>
+    </div>
   )
 }
 

@@ -1,64 +1,62 @@
-import { API_BASE_URL, useCollection } from '../api'
+import { useEffect, useState } from 'react'
 
-const endpointPath = "/api/activities/";
-const endpoint = `${API_BASE_URL}${endpointPath}`;
+const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+const API_URL = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev/api/activities/`
+  : `http://localhost:8000/api/activities/`
 
-function formatActivityDate(activityDate) {
-  if (!activityDate) {
-    return 'No date recorded'
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(activityDate))
+function extractList(data, key) {
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.results)) return data.results
+  if (Array.isArray(data?.[key])) return data[key]
+  return []
 }
 
 function Activities() {
-  const { endpoint: resolvedEndpoint, error, items: activities, status } = useCollection('activities', endpoint)
+  const [activities, setActivities] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then((data) => setActivities(extractList(data, 'activities')))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading activities...</p>
+  if (error) return <p>Error loading activities: {error}</p>
 
   return (
-    <section className="content-panel">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">Training log</p>
-          <h1>Activities</h1>
-        </div>
-        <span className="endpoint-label">{resolvedEndpoint}</span>
-      </div>
-
-      {status === 'loading' && <p className="state-text">Loading activities...</p>}
-      {status === 'error' && <p className="alert alert-warning mb-0">{error}</p>}
-
-      {status === 'success' && (
-        <div className="table-responsive data-table-wrap">
-          <table className="table align-middle mb-0">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Type</th>
-                <th>Duration</th>
-                <th>Distance</th>
-                <th>Calories</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activities.map((activity) => (
-                <tr key={activity._id ?? `${activity.userName}-${activity.activityDate}`}>
-                  <td>{activity.userName}</td>
-                  <td className="text-capitalize">{activity.type}</td>
-                  <td>{activity.durationMinutes} min</td>
-                  <td>{activity.distanceMiles ? `${activity.distanceMiles} mi` : 'n/a'}</td>
-                  <td>{activity.caloriesBurned}</td>
-                  <td>{formatActivityDate(activity.activityDate)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </section>
+    <div>
+      <h2>Activities</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Type</th>
+            <th>Duration (min)</th>
+            <th>Calories</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activities.map((activity) => (
+            <tr key={activity._id ?? activity.id}>
+              <td>{activity.userName}</td>
+              <td>{activity.type}</td>
+              <td>{activity.durationMinutes}</td>
+              <td>{activity.caloriesBurned}</td>
+              <td>{activity.activityDate ? new Date(activity.activityDate).toLocaleDateString() : ''}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
