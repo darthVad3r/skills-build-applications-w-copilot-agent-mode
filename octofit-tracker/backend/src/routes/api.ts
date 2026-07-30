@@ -8,7 +8,7 @@ import { Workout } from '../models/Workout';
 
 const router = Router();
 
-router.get('/users/', async (_req, res, next) => {
+router.get('/api/users/', async (_req, res, next) => {
   try {
     const users = await User.find().sort({ username: 1 });
     res.status(200).json({ users });
@@ -17,7 +17,7 @@ router.get('/users/', async (_req, res, next) => {
   }
 });
 
-router.get('/teams/', async (_req, res, next) => {
+router.get('/api/teams/', async (_req, res, next) => {
   try {
     const teams = await Team.find().sort({ name: 1 });
     res.status(200).json({ teams });
@@ -26,7 +26,7 @@ router.get('/teams/', async (_req, res, next) => {
   }
 });
 
-router.get('/activities/', async (_req, res, next) => {
+router.get('/api/activities/', async (_req, res, next) => {
   try {
     const activities = await Activity.find().sort({ activityDate: -1 });
     res.status(200).json({ activities });
@@ -35,7 +35,7 @@ router.get('/activities/', async (_req, res, next) => {
   }
 });
 
-router.get('/leaderboard/', async (_req, res, next) => {
+router.get('/api/leaderboard/', async (_req, res, next) => {
   try {
     const leaderboard = await Leaderboard.find().sort({ rank: 1 });
     res.status(200).json({ leaderboard });
@@ -44,7 +44,7 @@ router.get('/leaderboard/', async (_req, res, next) => {
   }
 });
 
-router.get('/workouts/', async (_req, res, next) => {
+router.get('/api/workouts/', async (_req, res, next) => {
   try {
     const workouts = await Workout.find().sort({ difficulty: 1, title: 1 });
     res.status(200).json({ workouts });
