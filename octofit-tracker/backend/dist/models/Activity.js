@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Activity = void 0;
+const mongoose_1 = require("mongoose");
+const activitySchema = new mongoose_1.Schema({
+    userName: { type: String, required: true },
+    type: { type: String, enum: ['run', 'cycle', 'swim', 'strength', 'yoga', 'hike'], required: true },
+    durationMinutes: { type: Number, required: true },
+    distanceMiles: { type: Number },
+    caloriesBurned: { type: Number, required: true },
+    activityDate: { type: Date, required: true },
+}, { timestamps: true });
+exports.Activity = (0, mongoose_1.model)('Activity', activitySchema);
