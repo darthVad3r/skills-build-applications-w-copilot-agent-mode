@@ -1,6 +1,7 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const endpoint = `${API_BASE_URL}/api/teams/`;
+const endpointPath = "/api/teams/";
+const endpoint = `${API_BASE_URL}${endpointPath}`;
 
 function Teams() {
   const { endpoint: resolvedEndpoint, error, items: teams, status } = useCollection('teams', endpoint)

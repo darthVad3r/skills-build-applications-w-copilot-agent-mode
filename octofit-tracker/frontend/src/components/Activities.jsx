@@ -1,6 +1,7 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const endpoint = `${API_BASE_URL}/api/activities/`;
+const endpointPath = "/api/activities/";
+const endpoint = `${API_BASE_URL}${endpointPath}`;
 
 function formatActivityDate(activityDate) {
   if (!activityDate) {

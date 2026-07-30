@@ -1,6 +1,7 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const endpoint = `${API_BASE_URL}/api/leaderboard/`;
+const endpointPath = "/api/leaderboard/";
+const endpoint = `${API_BASE_URL}${endpointPath}`;
 
 function Leaderboard() {
   const { endpoint: resolvedEndpoint, error, items: leaderboard, status } = useCollection('leaderboard', endpoint)
