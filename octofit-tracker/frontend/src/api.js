@@ -1,10 +1,18 @@
 import { useEffect, useState } from 'react'
 
-const codespaceName = import.meta.env.VITE_CODESPACE_NAME
+export const API_BASE_URL = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev`
+  : "http://localhost:8000"
 
-export const apiBaseUrl = codespaceName
-  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api`
-  : 'http://localhost:8000/api'
+export const apiBaseUrl = `${API_BASE_URL}/api`
+
+function buildEndpoint(endpointPath) {
+  if (endpointPath.startsWith('http://') || endpointPath.startsWith('https://')) {
+    return endpointPath
+  }
+
+  return `${API_BASE_URL}${endpointPath.endsWith('/') ? endpointPath : `${endpointPath}/`}`
+}
 
 function normalizeCollection(payload, resourceKey) {
   if (Array.isArray(payload)) {
@@ -38,11 +46,11 @@ function normalizeCollection(payload, resourceKey) {
   return []
 }
 
-export function useCollection(resourceKey) {
+export function useCollection(resourceKey, endpointPath = `/api/${resourceKey}`) {
   const [items, setItems] = useState([])
   const [status, setStatus] = useState('loading')
   const [error, setError] = useState('')
-  const endpoint = `${apiBaseUrl}/${resourceKey}/`
+  const endpoint = buildEndpoint(endpointPath)
 
   useEffect(() => {
     let active = true

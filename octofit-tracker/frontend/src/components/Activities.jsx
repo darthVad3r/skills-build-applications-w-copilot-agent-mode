@@ -1,4 +1,6 @@
-import { useCollection } from '../api'
+import { API_BASE_URL, useCollection } from '../api'
+
+const activitiesEndpoint = `${API_BASE_URL}/api/activities/`
 
 function formatActivityDate(activityDate) {
   if (!activityDate) {
@@ -12,7 +14,7 @@ function formatActivityDate(activityDate) {
 }
 
 function Activities() {
-  const { endpoint, error, items: activities, status } = useCollection('activities')
+  const { endpoint, error, items: activities, status } = useCollection('activities', activitiesEndpoint)
 
   return (
     <section className="content-panel">

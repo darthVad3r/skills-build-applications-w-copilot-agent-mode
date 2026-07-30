@@ -1,7 +1,9 @@
-import { useCollection } from '../api'
+import { API_BASE_URL, useCollection } from '../api'
+
+const leaderboardEndpoint = `${API_BASE_URL}/api/leaderboard/`
 
 function Leaderboard() {
-  const { endpoint, error, items: leaderboard, status } = useCollection('leaderboard')
+  const { endpoint, error, items: leaderboard, status } = useCollection('leaderboard', leaderboardEndpoint)
 
   return (
     <section className="content-panel">

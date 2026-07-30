@@ -1,7 +1,9 @@
-import { useCollection } from '../api'
+import { API_BASE_URL, useCollection } from '../api'
+
+const teamsEndpoint = `${API_BASE_URL}/api/teams/`
 
 function Teams() {
-  const { endpoint, error, items: teams, status } = useCollection('teams')
+  const { endpoint, error, items: teams, status } = useCollection('teams', teamsEndpoint)
 
   return (
     <section className="content-panel">

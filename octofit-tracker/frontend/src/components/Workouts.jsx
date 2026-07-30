@@ -1,7 +1,9 @@
-import { useCollection } from '../api'
+import { API_BASE_URL, useCollection } from '../api'
+
+const workoutsEndpoint = `${API_BASE_URL}/api/workouts/`
 
 function Workouts() {
-  const { endpoint, error, items: workouts, status } = useCollection('workouts')
+  const { endpoint, error, items: workouts, status } = useCollection('workouts', workoutsEndpoint)
 
   return (
     <section className="content-panel">

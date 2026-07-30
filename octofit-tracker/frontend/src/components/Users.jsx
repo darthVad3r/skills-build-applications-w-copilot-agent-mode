@@ -1,7 +1,9 @@
-import { useCollection } from '../api'
+import { API_BASE_URL, useCollection } from '../api'
+
+const usersEndpoint = `${API_BASE_URL}/api/users/`
 
 function Users() {
-  const { endpoint, error, items: users, status } = useCollection('users')
+  const { endpoint, error, items: users, status } = useCollection('users', usersEndpoint)
 
   return (
     <section className="content-panel">
