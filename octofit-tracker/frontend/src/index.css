@@ -1,0 +1,28 @@
+:root {
+  --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  color: #21342d;
+  font: 16px/1.5 Avenir, Montserrat, Corbel, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1 {
+  color: #12372f;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 900;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
