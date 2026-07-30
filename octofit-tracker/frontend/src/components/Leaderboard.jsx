@@ -1,9 +1,9 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const leaderboardEndpoint = `${API_BASE_URL}/api/leaderboard/`
+const endpoint = `${API_BASE_URL}/api/leaderboard/`;
 
 function Leaderboard() {
-  const { endpoint, error, items: leaderboard, status } = useCollection('leaderboard', leaderboardEndpoint)
+  const { endpoint: resolvedEndpoint, error, items: leaderboard, status } = useCollection('leaderboard', endpoint)
 
   return (
     <section className="content-panel">
@@ -12,7 +12,7 @@ function Leaderboard() {
           <p className="eyebrow">Competition</p>
           <h1>Leaderboard</h1>
         </div>
-        <span className="endpoint-label">{endpoint}</span>
+        <span className="endpoint-label">{resolvedEndpoint}</span>
       </div>
 
       {status === 'loading' && <p className="state-text">Loading leaderboard...</p>}

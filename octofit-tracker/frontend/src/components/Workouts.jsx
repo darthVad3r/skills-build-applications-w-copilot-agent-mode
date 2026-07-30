@@ -1,9 +1,9 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const workoutsEndpoint = `${API_BASE_URL}/api/workouts/`
+const endpoint = `${API_BASE_URL}/api/workouts/`;
 
 function Workouts() {
-  const { endpoint, error, items: workouts, status } = useCollection('workouts', workoutsEndpoint)
+  const { endpoint: resolvedEndpoint, error, items: workouts, status } = useCollection('workouts', endpoint)
 
   return (
     <section className="content-panel">
@@ -12,7 +12,7 @@ function Workouts() {
           <p className="eyebrow">Suggestions</p>
           <h1>Workouts</h1>
         </div>
-        <span className="endpoint-label">{endpoint}</span>
+        <span className="endpoint-label">{resolvedEndpoint}</span>
       </div>
 
       {status === 'loading' && <p className="state-text">Loading workouts...</p>}

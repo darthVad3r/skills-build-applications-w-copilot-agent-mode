@@ -1,9 +1,9 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const teamsEndpoint = `${API_BASE_URL}/api/teams/`
+const endpoint = `${API_BASE_URL}/api/teams/`;
 
 function Teams() {
-  const { endpoint, error, items: teams, status } = useCollection('teams', teamsEndpoint)
+  const { endpoint: resolvedEndpoint, error, items: teams, status } = useCollection('teams', endpoint)
 
   return (
     <section className="content-panel">
@@ -12,7 +12,7 @@ function Teams() {
           <p className="eyebrow">Groups</p>
           <h1>Teams</h1>
         </div>
-        <span className="endpoint-label">{endpoint}</span>
+        <span className="endpoint-label">{resolvedEndpoint}</span>
       </div>
 
       {status === 'loading' && <p className="state-text">Loading teams...</p>}

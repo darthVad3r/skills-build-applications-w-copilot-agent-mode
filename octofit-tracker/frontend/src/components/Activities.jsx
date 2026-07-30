@@ -1,6 +1,6 @@
 import { API_BASE_URL, useCollection } from '../api'
 
-const activitiesEndpoint = `${API_BASE_URL}/api/activities/`
+const endpoint = `${API_BASE_URL}/api/activities/`;
 
 function formatActivityDate(activityDate) {
   if (!activityDate) {
@@ -14,7 +14,7 @@ function formatActivityDate(activityDate) {
 }
 
 function Activities() {
-  const { endpoint, error, items: activities, status } = useCollection('activities', activitiesEndpoint)
+  const { endpoint: resolvedEndpoint, error, items: activities, status } = useCollection('activities', endpoint)
 
   return (
     <section className="content-panel">
@@ -23,7 +23,7 @@ function Activities() {
           <p className="eyebrow">Training log</p>
           <h1>Activities</h1>
         </div>
-        <span className="endpoint-label">{endpoint}</span>
+        <span className="endpoint-label">{resolvedEndpoint}</span>
       </div>
 
       {status === 'loading' && <p className="state-text">Loading activities...</p>}
